@@ -36,6 +36,7 @@ namespace TelegramAPI
             catch (Exception e)
             {
                 Console.WriteLine($"Unable to connect to {host}:{port}");
+                throw;
             }
         }
 
@@ -68,7 +69,6 @@ namespace TelegramAPI
 
         public async void Dispose()
         {
-            await stream.DisposeAsync();
             client.Dispose();
         }
     }

@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Security.Cryptography;
+using System.Text;
 using TelegramAPI;
 
 namespace ConsoleUI
@@ -8,11 +9,25 @@ namespace ConsoleUI
         public static async Task Main(string[] args)
         {
             using var connection = new Connection();
-            await connection.ConnectAsync("192.169.0.1", 80);
+            await connection.ConnectAsync("149.154.167.50", 443);
 
-            var requestMessage = $"GET / HTTP/1.1\r\nHost: www.google.com\r\nConnection: Close\r\n\r\n";
-            var requestData = Encoding.UTF8.GetBytes(requestMessage);
-            await connection.SendAsync(requestData);
+            byte[] nonce = RandomNumberGenerator.GetBytes(16);
+            var tl = new TLWriter();
+            tl.WriteInt(0x60469778);
+            tl.WriteRaw(nonce);
+            var payload = tl.GetBytes();
+
+            var stream = new MemoryStream();
+            var authKeyId = new byte[8];
+            stream.Write(authKeyId);
+            var id = DateTimeOffset.UtcNow.ToUnixTimeSeconds() << 32;
+            stream.Write(BitConverter.GetBytes(id), 0, 8);
+            stream.Write(BitConverter.GetBytes(payload.Length));
+            stream.Write(payload);
+
+            var packet = stream.ToArray();
+
+            await connection.SendAsync(packet);
 
             var received = await connection.ReceiveAsync();
             Console.WriteLine(received);

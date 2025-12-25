@@ -33,7 +33,7 @@ namespace TelegramAPI
                 stream = client.GetStream();
                 Console.WriteLine($"Connected to {host}:{port}");
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 Console.WriteLine($"Unable to connect to {host}:{port}");
                 throw;

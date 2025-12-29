@@ -15,8 +15,9 @@ namespace TelegramAPI
             return stream.ToArray();
         }
 
-        public void WriteInt(int value)
+        public void WriteInt(uint value)
         {
+            var bytes = BitConverter.GetBytes(value);
             stream.Write(BitConverter.GetBytes(value));
         }
 
@@ -27,20 +28,12 @@ namespace TelegramAPI
 
         public void WriteRaw(byte[] data)
         {
-            if (data.Length < 254)
-                stream.WriteByte((byte)data.Length);
-            else
-            {
-                stream.WriteByte(254);
-                stream.Write(BitConverter.GetBytes(data.Length), 0, 3);
-            }
-
             stream.Write(data);
+        }
 
-            while (stream.Length % 4 != 0)
-            {
-                stream.WriteByte(0);
-            }
+        public static string GetStringRepresentation(byte[] bytes)
+        {
+            return string.Join(" ", bytes.Select(b => b.ToString("X2")));
         }
     }
 }

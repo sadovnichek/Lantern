@@ -8,7 +8,7 @@ namespace TelegramAPI
 {
     public interface IWriter
     {
-        void WriteInt(int value);
+        void WriteInt(uint value);
 
         void WriteString(string value);
 

@@ -16,8 +16,6 @@ namespace TelegramAPI
         public Connection(string ip, int port)
         {
             client = new TcpClient(new IPEndPoint(IPAddress.Parse(ip), port));
-            client.ReceiveTimeout = 1000;
-            client.SendTimeout = 1000;
         }
 
         public Connection()
@@ -31,11 +29,15 @@ namespace TelegramAPI
             {
                 await client.ConnectAsync(host, port);
                 stream = client.GetStream();
+#if DEBUG
                 Console.WriteLine($"Connected to {host}:{port}");
+#endif
             }
             catch (Exception)
             {
+#if DEBUG
                 Console.WriteLine($"Unable to connect to {host}:{port}");
+#endif
                 throw;
             }
         }
@@ -45,20 +47,20 @@ namespace TelegramAPI
             await stream.WriteAsync(data);
         }
 
-        public async Task<string> ReceiveAsync()
+        public async Task<byte[]> ReceiveAsync()
         {
             var responseData = new byte[1024];
-            var response = new StringBuilder();
+            var response = new MemoryStream();
             int bytes;
 
             do
             {
                 bytes = await stream.ReadAsync(responseData);
-                response.Append(Encoding.UTF8.GetString(responseData, 0, bytes));
+                response.Write(responseData, 0, bytes);
             }
             while (client.Available > 0);
 
-            return response.ToString();
+            return response.ToArray();
         }
 
         public void Close()

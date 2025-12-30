@@ -10,6 +10,8 @@ namespace TelegramAPI
     {
         private readonly MemoryStream stream = new MemoryStream();
 
+        private static byte[] req = new byte[] { 0xf1, 0x8e, 0x7e, 0xbe };
+
         public byte[] GetBytes()
         {
             return stream.ToArray();
@@ -17,7 +19,6 @@ namespace TelegramAPI
 
         public void WriteInt(uint value)
         {
-            var bytes = BitConverter.GetBytes(value);
             stream.Write(BitConverter.GetBytes(value));
         }
 
@@ -34,6 +35,11 @@ namespace TelegramAPI
         public static string GetStringRepresentation(byte[] bytes)
         {
             return string.Join(" ", bytes.Select(b => b.ToString("X2")));
+        }
+
+        public void WriteReq()
+        {
+            stream.Write(req);
         }
     }
 }
